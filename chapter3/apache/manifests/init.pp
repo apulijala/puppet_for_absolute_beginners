@@ -4,56 +4,47 @@
 # Parameters
 # ----------
 
-class apache {
+class apache($apachefiles = {}) {
 
- # Set File Defaults. 
- File {
-    owner => "apache",
-    group => "apache", 
-    require => Package["httpd"],
+  # Declare defaults. 
+  File {
     notify => Service["httpd"],
+    require => Package["httpd"],
+    owner => "apache",
+    group => "apache",
     mode => "0644",
- }
- 
- # Install httpd package. 
- package { "httpd" : 
-	ensure => installed
-
- }
- 
- # Create files index.html and cookbook.html 
- $index = @(INDEX)
-  <html>
-    <body>
-	<h1>  <a href = "cookbook.html" > Cookbook !! </a>  </h1>
-   </body>
- </html>
- | INDEX
-
- $cookbook = @(COOKBOOK)
-  <html>
-    <body>
-	<h1> Cookbook !! </h1>
-   </body>
- </html>
-
- |COOKBOOK
-
- # Declare variables 
- $allfiles = {
-	"/var/www/html/index.html" => "$index",
-        "/var/www/html/cookbook.html" => "$cookbook"
- }
- 
- $allfiles.each|String $a_file, String $content| {
-	file { "$a_file" : 
-		content => "$content"
+  } 
+  
+  # Install Apache. 
+  Package { "httpd" : 
+	ensure => "installed",
+  }
+  
+  # Declare files. 
+  $apachefiles.each |$file,$content| {
+	file { "$file" : 
+	  content => "$content"
 	}
- }
-
- service { "httpd" : 
-	ensure => running
- }
-
+  }
+  # Restart service
+  service { "httpd" : 
+	ensure => "running"
+  }
 }
 
+class newapache {
+}
+
+define tmpfile($content = "") {
+  file { "/tmp/${name}" :
+	content => $content
+  }
+}
+
+define mywebapp (String $domain = $facts["networking"]["domain"],
+	String $path,
+	String $platform)
+{
+	notify { "$domain $path and $platform" :
+	}
+}
