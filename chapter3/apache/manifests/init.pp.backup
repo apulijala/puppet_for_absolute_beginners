@@ -1,0 +1,55 @@
+# Class: apache
+# ===========================
+#
+# Full description of class apache here.
+#
+# Parameters
+# ----------
+#
+
+class apache {
+
+	File {
+		owner => "apache",
+		group => "apache",
+		ensure => "present",
+		mode => '0644',
+		require => Package['httpd']
+	}
+
+	package { "httpd" : 
+		ensure => present
+	}
+
+	$index = @(INDEX)
+	<html>
+	 <body>
+	   <h1> <a href = "cookbook.html"> Cookbook !! </a>
+	 </body>
+	</html>
+	| INDEX
+
+	$cookbook = @(COOKBOOK)
+	 <html>
+		<body>
+			<h2> Packt Pub </h2>
+		</body>
+	 </html>
+	| COOKBOOK
+
+	$contfiles = {
+		"/var/www/html/index.html" => $index,
+		"/var/www/html/cookbook.html" => $cookbook,
+	}
+	$contfiles.each |String $name,String $content| {
+                file {"$name":
+                        ensure => present,
+                        content => "$content",
+                }
+        }
+
+	service { "httpd" : 
+		ensure => "running"
+	}
+
+}
