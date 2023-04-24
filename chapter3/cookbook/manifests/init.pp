@@ -50,6 +50,7 @@ class cookbook {
 	}
 
 	# Add a line called Jaya Guru Datta !!
+	#  World!
 	file_line { "greeting" : 
 		path => "/tmp/cookbook", 
 		line => "Jaya Guru Datta!!",
@@ -57,3 +58,49 @@ class cookbook {
 	}
 	
 }
+
+class cookbook::addlines {
+
+	file { "/tmp/cookbook" : 
+		ensure => file
+	}
+
+	file_line { "hello-line" : 
+		ensure => present, 
+		path => "/tmp/cookbook", 
+		line => "Hello World!",
+		require => File["/tmp/cookbook"]
+
+	}
+	
+	file_line { "fish-line" : 
+		ensure => present, 
+		path => "/tmp/cookbook", 
+		line => "So long, and thanks for all the fish.",
+		require => File["/tmp/cookbook"]
+	}
+}
+
+class cookbook::removelines {
+
+	file_line { "hello-removal" : 
+		ensure => absent, 
+		path => "/tmp/cookbook", 
+		line => "Hello World!",
+		# require => File["/tmp/cookbook"]
+	}
+
+	file_line { "fish-changed" : 
+		path => "/tmp/cookbook", 
+		line => "Oh freddled gruntbuggly, thanks for all the fish.",
+		 match => 'fish.$'
+		# require => File["/tmp/cookbook"] # This has to be resource, not actual file.l 
+
+	}
+}
+
+
+
+
+
+
